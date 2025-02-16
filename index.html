@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StyleAura - AI Fashion Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .neu-brutalism {
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0 #000;
+            transition: all 0.2s ease;
+        }
+        .neu-brutalism:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 7px 7px 0 #000;
+        }
+        .neu-brutalism:active {
+            transform: translate(0, 0);
+            box-shadow: 3px 3px 0 #000;
+        }
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #FF007F;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen font-['Space_Grotesk']">
+    <div id="loader">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Auth Section -->
+    <div id="authSection" class="max-w-md mx-auto mt-10 px-4">
+        <div class="bg-[#FFE5E5] p-8 neu-brutalism rounded-lg">
+            <h1 class="text-3xl font-bold mb-6 text-center">StyleAura</h1>
+            <div class="bg-[#FFB6C1] p-2 neu-brutalism mb-6 text-center">
+                <p>AI-Powered Fashion Stylist</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-lg mb-2">Email</label>
+                    <input type="email" class="w-full p-3 neu-brutalism bg-white" required>
+                </div>
+                <div>
+                    <label class="block text-lg mb-2">Password</label>
+                    <input type="password" class="w-full p-3 neu-brutalism bg-white" required>
+                </div>
+                <button type="submit" class="w-full bg-[#FF007F] text-white p-3 neu-brutalism mt-4">
+                    Login
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="hidden space-y-4">
+                <div>
+                    <label class="block text-lg mb-2">Name</label>
+                    <input type="text" class="w-full p-3 neu-brutalism bg-white" required>
+                </div>
+                <div>
+                    <label class="block text-lg mb-2">Email</label>
+                    <input type="email" class="w-full p-3 neu-brutalism bg-white" required>
+                </div>
+                <div>
+                    <label class="block text-lg mb-2">Password</label>
+                    <input type="password" class="w-full p-3 neu-brutalism bg-white" required>
+                </div>
+                <button type="submit" class="w-full bg-[#FF007F] text-white p-3 neu-brutalism mt-4">
+                    Register
+                </button>
+            </form>
+
+            <p class="mt-4 text-center">
+                <button id="toggleAuth" class="text-[#FF007F] underline">
+                    Switch to Register
+                </button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Main App Section -->
+    <div id="mainApp" class="hidden">
+        <nav class="bg-[#FFE5E5] p-4 neu-brutalism mb-8">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">StyleAura</h1>
+                <button id="logoutBtn" class="bg-[#FF007F] text-white px-4 py-2 neu-brutalism">
+                    Logout
+                </button>
+            </div>
+        </nav>
+
+        <div class="container mx-auto px-4 max-w-4xl">
+            <div class="bg-[#FFE5E5] p-6 neu-brutalism rounded-lg mb-8">
+                <h2 class="text-2xl font-bold mb-6">Style Analysis</h2>
+
+                <!-- Image Upload Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold">Body Shape Analysis</h3>
+                        <div class="bg-white p-6 neu-brutalism text-center" id="bodyImageUpload">
+                            <input type="file" id="bodyImageInput" class="hidden" accept="image/*">
+                            <label for="bodyImageInput" class="cursor-pointer block">
+                                <i class="bi bi-cloud-upload text-4xl"></i>
+                                <p class="mt-2">Upload Full Body Photo</p>
+                            </label>
+                            <img id="bodyImagePreview" class="mt-4 mx-auto hidden max-h-48 neu-brutalism">
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold">Skin Undertone Analysis</h3>
+                        <div class="bg-white p-6 neu-brutalism text-center" id="undertoneImageUpload">
+                            <input type="file" id="undertoneImageInput" class="hidden" accept="image/*">
+                            <label for="undertoneImageInput" class="cursor-pointer block">
+                                <i class="bi bi-cloud-upload text-4xl"></i>
+                                <p class="mt-2">Upload Face Photo</p>
+                            </label>
+                            <img id="undertoneImagePreview" class="mt-4 mx-auto hidden max-h-48 neu-brutalism">
+                        </div>
+                    </div>
+                </div>
+
+                <button id="analyzeBtn" class="w-full bg-[#FF007F] text-white p-4 neu-brutalism font-bold">
+                    Analyze My Style
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="hidden">
+                <div class="bg-[#FFE5E5] p-6 neu-brutalism rounded-lg mb-8">
+                    <h2 class="text-2xl font-bold mb-6">Your Style Profile</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white p-4 neu-brutalism">
+                            <h3 class="text-lg font-bold mb-2">Body Shape:</h3>
+                            <p id="bodyShapeResult" class="text-xl text-[#FF007F]">Analyzing...</p>
+                        </div>
+                        <div class="bg-white p-4 neu-brutalism">
+                            <h3 class="text-lg font-bold mb-2">Undertone:</h3>
+                            <p id="undertoneResult" class="text-xl text-[#FF007F]">Analyzing...</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold mb-4">Choose Event Type</h3>
+                        <select id="eventType" class="w-full p-3 neu-brutalism bg-white">
+                            <option value="">Select an Event</option>
+                            <option value="casual">Casual Outing</option>
+                            <option value="formal">Formal Event</option>
+                            <option value="party">Party</option>
+                            <option value="business">Business Meeting</option>
+                        </select>
+                    </div>
+
+                    <div id="recommendations" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Recommendations will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const authSection = document.getElementById('authSection');
+        const mainApp = document.getElementById('mainApp');
+        const toggleAuthBtn = document.getElementById('toggleAuth');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resultsSection = document.getElementById('resultsSection');
+        const loader = document.getElementById('loader');
+
+        // Toggle Auth Forms
+        toggleAuthBtn.addEventListener('click', () => {
+            loginForm.classList.toggle('hidden');
+            registerForm.classList.toggle('hidden');
+            toggleAuthBtn.textContent = loginForm.classList.contains('hidden') ? 
+                'Switch to Login' : 'Switch to Register';
+        });
+
+        // Handle Image Uploads
+        ['body', 'undertone'].forEach(type => {
+            const input = document.getElementById(`${type}ImageInput`);
+            const preview = document.getElementById(`${type}ImagePreview`);
+            
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+        // Analyze Button Click
+        analyzeBtn.addEventListener('click', async () => {
+            loader.style.display = 'flex';
+            
+            try {
+                // Simulate API call delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                resultsSection.classList.remove('hidden');
+                document.getElementById('bodyShapeResult').textContent = 
+                    ['Hourglass', 'Pear', 'Rectangle', 'Triangle'][Math.floor(Math.random() * 4)];
+                document.getElementById('undertoneResult').textContent = 
+                    ['Warm', 'Cool', 'Neutral'][Math.floor(Math.random() * 3)];
+                
+            } catch (error) {
+                console.error('Analysis failed:', error);
+            } finally {
+                loader.style.display = 'none';
+            }
+        });
+
+        // Event Type Change
+        document.getElementById('eventType').addEventListener('change', (e) => {
+            const recommendations = document.getElementById('recommendations');
+            recommendations.innerHTML = ''; // Clear previous recommendations
+            
+            if (e.target.value) {
+                // Add sample recommendations (in real app, these would come from the AI)
+                for (let i = 0; i < 4; i++) {
+                    recommendations.innerHTML += `
+                        <div class="bg-white p-4 neu-brutalism">
+                            <div class="bg-[#FFE5E5] h-48 mb-4 neu-brutalism flex items-center justify-center">
+                                <i class="bi bi-image text-4xl"></i>
+                            </div>
+                            <h4 class="font-bold">Outfit Suggestion ${i + 1}</h4>
+                            <p class="text-sm mt-2">Perfect for your ${e.target.value} event!</p>
+                        </div>
+                    `;
+                }
+            }
+        });
+
+        // Auth Forms Submission
+        [loginForm, registerForm].forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                authSection.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+            });
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            mainApp.classList.add('hidden');
+            authSection.classList.remove('hidden');
+            resultsSection.classList.add('hidden');
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
